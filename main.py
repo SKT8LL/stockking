@@ -235,11 +235,22 @@ def main():
 
 
 
-        # 에이전트 초기화
+        # 에이전트 초기화 (PDF 경로 포함)
+        print(f"\n🔧 에이전트 초기화 중...")
+        print(f"   📄 PDF 경로: {pdf_path if pdf_path else '없음 (RAG 비활성화)'}")
+
         agent = InvestmentAgent(
             openai_api_key=OPENAI_API_KEY,
-            perplexity_api_key=PERPLEXITY_API_KEY
+            perplexity_api_key=PERPLEXITY_API_KEY,
+            pdf_path=pdf_path  # PDF 경로 전달
         )
+
+        # RAG 초기화 확인
+        if agent.vector_store:
+            print(f"   ✓ RAG 초기화 완료")
+        else:
+            print(f"   ⚠️ RAG 미활성화 (PDF 없음)")
+
 
         # 사용자 입력
         user_query = input("\n분석할 주식을 입력하세요 (예: what is iren?): ").strip()
@@ -249,14 +260,9 @@ def main():
 
         # 분석 실행
         try:
-            # PDF 경로 확인
-            if not os.path.exists(pdf_path):
-                print(f"⚠️ PDF 파일({pdf_path})이 없어 RAG 없이 분석합니다.")
-                pdf_path = None
-
             result = agent.analyze_stock(
                 user_query=user_query,
-                pdf_path=pdf_path
+                pdf_path=None  # 이미 초기화 시 설정됨
             )
 
             # 결과 출력

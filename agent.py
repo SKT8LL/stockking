@@ -21,11 +21,16 @@ class InvestmentState(TypedDict):
 
 
 class InvestmentAgent:
-    def __init__(self, openai_api_key: str, perplexity_api_key: str):
+    def __init__(self, openai_api_key: str, perplexity_api_key: str, pdf_path: str = None):
         self.openai_api_key = openai_api_key
         self.perplexity_api_key = perplexity_api_key
         self.vector_store = None
         os.environ["OPENAI_API_KEY"] = openai_api_key
+
+        # PDF 경로가 제공되면 즉시 RAG 초기화
+        if pdf_path and os.path.exists(pdf_path):
+            print(f"🔧 에이전트 초기화 시 RAG 설정: {pdf_path}")
+            self.initialize_rag(pdf_path)
 
     def perplexity_research_node(self, state: InvestmentState) -> InvestmentState:
         """Perplexity API로 정보 수집"""
@@ -96,6 +101,14 @@ Only use information from reliable financial sources."""
 
     def initialize_rag(self, pdf_path: str):
         """RAG 시스템 초기화"""
+        if not pdf_path:
+            print("⚠️ PDF 경로가 제공되지 않았습니다. RAG 초기화 건너뜀")
+            return
+
+        if not os.path.exists(pdf_path):
+            print(f"⚠️ PDF 파일을 찾을 수 없습니다: {pdf_path}")
+            return
+
         print(f"📄 PDF 로딩 중: {pdf_path}")
 
         loader = PyPDFLoader(pdf_path)
@@ -229,7 +242,7 @@ Only use information from reliable financial sources."""
         print("🎯 버핏 스타일 주식 분석 시작")
         print("=" * 60)
 
-        print("pdf path :" + pdf_path)
+        print(f"pdf path: {pdf_path if pdf_path else 'None (RAG 비활성화)'}")
         if pdf_path:
             self.initialize_rag(pdf_path)
 

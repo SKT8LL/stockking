@@ -1,6 +1,6 @@
 import streamlit as st
-from agent import InvestmentAgent
 import os
+from agent import InvestmentAgent
 
 # 페이지 설정
 st.set_page_config(
@@ -46,14 +46,24 @@ if not st.session_state.logged_in:
                 st.error("⚠️ 모든 API 키를 입력해주세요!")
             else:
                 try:
-                    # API 키 검증을 위해 에이전트 초기화 시도
+                    # 기본 PDF 경로 확인
+                    default_pdf = "stockking.pdf"
+                    pdf_path = default_pdf if os.path.exists(default_pdf) else None
+
+                    # API 키 검증을 위해 에이전트 초기화 (PDF 포함)
                     agent = InvestmentAgent(
                         openai_api_key=openai_key,
-                        perplexity_api_key=perplexity_key
+                        perplexity_api_key=perplexity_key,
+                        pdf_path=pdf_path
                     )
                     st.session_state.agent = agent
                     st.session_state.logged_in = True
-                    st.success("✅ 로그인 성공!")
+
+                    # RAG 초기화 상태 표시
+                    if agent.vector_store:
+                        st.success(f"✅ 로그인 성공! (RAG 초기화 완료: {pdf_path})")
+                    else:
+                        st.success("✅ 로그인 성공! (RAG 미사용)")
                     st.rerun()
                 except Exception as e:
                     st.error(f"❌ API 키 검증 실패: {str(e)}")
