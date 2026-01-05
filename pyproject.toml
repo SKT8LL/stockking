@@ -1,0 +1,16 @@
+[project]
+name = "stockking"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "faiss-cpu>=1.13.2",
+    "langchain-community>=0.4.1",
+    "langchain-openai>=1.1.6",
+    "langchain-text-splitters>=1.1.0",
+    "langgraph>=1.0.5",
+    "pypdf>=6.5.0",
+    "requests>=2.32.5",
+    "streamlit>=1.52.2",
+]
